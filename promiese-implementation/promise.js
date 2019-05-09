@@ -5,7 +5,8 @@
  */
 var Promise = function (promiseFn) {
     var isPromiseFnDefined = typeof promiseFn == 'function' ? true  : false;
-    var _constants = {
+    
+    Promise._constants = {
         states: {
             pending: 'Pending',
             resolved: 'Resolved',
@@ -13,48 +14,97 @@ var Promise = function (promiseFn) {
         }
     }
 
-    function PromiseRootFn(){}
-    PromiseRootFn.prototype.then = function (resolveCallback) {
-        // should return a promise object
-        promiseInstance.resolveCallback = resolveCallback;
-        promiseInstance.promiseChainObject = new Promise();
-        return promiseInstance.promiseChainObject;
+    function PromiseRootFn(promiseFn){
+        this.resolveCallback = undefined;
+        this.rejectCallback = undefined;
+        this.resolvedValue = undefined;
+        this.status = Promise._constants.states.pending;
+        this.promiseFn = isPromiseFnDefined ? promiseFn : function(resolve, reject){resolve(promiseInstance.resolvedValue)};
     }
-    PromiseRootFn.prototype.catch = function (rejectCallback) {
-        /**
-         * @todo Catch Should return a promise Object
-         */
-        promiseInstance.rejectCallback = rejectCallback;
-    }
-
-    PromiseRootFn.prototype.resolve = function (result) {
-        // should return a promise object
-        promiseInstance.resolvedValue = result;
-        promiseInstance.status = _constants.states.resolved;
-        if (promiseInstance.resolveCallback) {
-            let resolveCallbackReslut = promiseInstance.resolveCallback(result);
-            promiseInstance.promiseChainObject.resolvedValue = resolveCallbackReslut;
-            promiseInstance.promiseChainObject.promiseFn(promiseInstance.promiseChainObject.resolve, promiseInstance.promiseChainObject.reject);
-        }
-    }
-
-    PromiseRootFn.prototype.reject = function (result) {
-        // should return a promise object
-        promiseInstance.status = _constants.states.rejected;
-        if (promiseInstance.rejectCallback){
-            promiseInstance.rejectCallback(result);
-        }
-    }
-    var promiseInstance = new PromiseRootFn();
-    promiseInstance.status = _constants.states.pending;
-    promiseInstance.resolveCallback = undefined;
-    promiseInstance.rejectCallback = undefined;
-    promiseInstance.resolvedValue = undefined;
-    promiseInstance.promiseFn = isPromiseFnDefined ? promiseFn : function(resolve, reject){resolve(promiseInstance.resolvedValue)};
+    Object.assign(PromiseRootFn.prototype, Promise.handlerFns);
     
-    if(isPromiseFnDefined) promiseFn(promiseInstance.resolve, promiseInstance.reject);
+    var promiseInstance = new PromiseRootFn(promiseFn);
+    promiseInstance.promiseFn(promiseInstance.resolve.bind(promiseInstance), promiseInstance.reject.bind(promiseInstance));
     return promiseInstance;
 }
+
+Promise.handlerFns = {
+    then : function (resolveCallback) {
+        // should return a promise object
+        this.resolveCallback = resolveCallback;
+        this.promiseChainObject = new Promise();
+        this.promiseChainObject.then = Promise.PromiseThenOverride;
+        return this.promiseChainObject;
+    },
+    catch : function (rejectCallback) {
+        this.rejectCallback = rejectCallback;
+    },
+    resolve : function (result) {
+        this.resolvedValue = result;
+        this.status = Promise._constants.states.resolved;
+        if (this.resolveCallback) {
+            let resolveCallbackReslut = this.resolveCallback(result);
+            this.promiseChainObject.resolvedValue = resolveCallbackReslut;
+            if(this.promiseChainObject.resolveCallback){
+                this.promiseChainObject.resolveCallback();
+            }
+        }
+    },
+    reject : function (result) {
+        // should return a promise object
+        this.status = Promise._constants.states.rejected;
+        if (this.rejectCallback){
+            this.rejectCallback(result);
+        }
+    },
+}
+
+Promise.PromiseThenOverride = function(successCallback){
+    // promiseChainThen should have access to 
+    var wrapperSuccessCallback = function(succCB){
+        return function(){
+            try {
+                succCB()
+            }catch(err){
+                // Find the nearest catch reject callback and pass the error to it
+                var head = this.promiseChainObject;
+                while(head){
+                    if(this.promiseChainObject.rejectCallback){
+                        this.promiseChainObject.rejectCallback(err);
+                        break;
+                    } else {
+                        head = this.promiseChainObject.promiseChainObject;
+                    }
+                }
+                if(!head) throw err;
+            }
+        }
+    }
+    successCallback = wrapperSuccessCallback(successCallback)
+    setTimeout(successCallback, 0)
+}
+
+Promise.all = function(promiseArray){
+    var totalPromises = promiseArray.length;
+    var promisesResolved;
+    var promiseResults = [];
+    var promiseCRONJ = setInterval(function(){
+        try { // try catch to comeout of
+            promiseArray.forEach(function(promise, index){
+                if(promise.status  == Promise._constants.resolved){
+                    promiseResults[index] = promise.resolvedValue;
+                } else if(promise.status  == Promise._constants.rejected){
+                    clearInterval(promiseCRONJ);
+                    throw "One Promise Failled"
+                }
+            })
+        } catch(err){
+            
+        }
+    },10)
+}
+
+
 /* 
 // Example 1
 
@@ -69,13 +119,23 @@ new Promise(function(resolve, reject){
 })
 
 // Example 2 
-var promisyingFn = function(resolve, reject){
+new Promise (function(resolve, reject){
 	setTimeout(function(){
-		resolve('TIME OUT OVER')
-	},10000)
-}
+		reject('TIME OUT OVER')
+	},2000)
+}).catch(function(err){
+    console.log('Error Catched');
+})
 
 var promiseObj = new Promise(promisyingFn)
 promiseObj.then(function(result){
     console.log('SUCCESS CALLBACK EXECUTING');
 }) */
+
+var temp = new Promise (function(resolve, reject){
+	setTimeout(function(){
+		reject('TIME OUT OVER')
+	},2000)
+}).catch(function(err){
+    console.log('Error Catched');
+})
