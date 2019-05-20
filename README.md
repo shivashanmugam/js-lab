@@ -1,3 +1,3 @@
 # js-lab
 
-avascript experiments
+javascript experiments
