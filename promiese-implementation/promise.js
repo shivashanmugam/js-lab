@@ -66,7 +66,7 @@ Promise.PromiseThenOverride = function(successCallback){
             try {
                 succCB()
             }catch(err){
-                // Find the nearest catch reject callback and pass the error to it
+                // Find the nearest catch callback (reject callback) and pass the error to it
                 var head = this.promiseChainObject;
                 while(head){
                     if(this.promiseChainObject.rejectCallback){
