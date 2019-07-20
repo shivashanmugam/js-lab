@@ -1,7 +1,6 @@
 /**
  * 
- * @todo : catch support 
- * @todo : Promise.all and Promise.race support
+ * @todo : Promise.race support
  */
 var Promise = function (promiseFn) {
     var isPromiseFnDefined = typeof promiseFn == 'function' ? true  : false;
