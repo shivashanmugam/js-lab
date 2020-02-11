@@ -3,7 +3,7 @@ var chai = require('../../../libs/chai/chai');
 var assert = chai.assert;
 var expect = chai.expect;
 
-describe('Binary Tree', function () {
+describe('Binary Tree creating instance', function () {
     it('Create a tree instance', function () {
         var my_tree = new Tree([]);
         assert.equal(true, 'root' in my_tree)

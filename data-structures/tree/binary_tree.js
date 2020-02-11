@@ -8,6 +8,7 @@ exports.Tree = class {
     }
 
     add(value) {
+        // if root already exists
         if (this.root) {
             let position = this.get_position(value);
             position.node[position.branch] = new Node(value, position.node);
@@ -18,6 +19,7 @@ exports.Tree = class {
     }
 
     delete(value) {
+        // get node object
         var node = this._detect_node(value, this.root)
         if (node) {
             var heir;
@@ -43,6 +45,7 @@ exports.Tree = class {
         }
     }
 
+    // while deleting linking the child nodes with parents
     _leave_kids_to_gramps(me, child) {
         if (child == null) {
             me = null;
@@ -52,6 +55,7 @@ exports.Tree = class {
         }
     }
 
+    // getting to the node position through value
     _detect_node(value, node) {
         if (node) {
             if (node.value < value) {
@@ -64,6 +68,7 @@ exports.Tree = class {
         }
     }
 
+    // finding the minimum value in subtree
     find_min(node) {
         if (node.left) {
             return this.find_min(node.left)
@@ -72,6 +77,7 @@ exports.Tree = class {
         }
     }
 
+    // finding the maximum value in subtree
     find_max(node) {
         if (node.right) {
             return this.find_max(node.right)
@@ -80,6 +86,7 @@ exports.Tree = class {
         }
     }
 
+    // finding the right node to insert new value
     get_position(value) {
         let current_node = this.root;
         var position;
@@ -134,14 +141,6 @@ exports.Tree = class {
         }
         console.log(traverse_values);
         return traverse_values;
-
-    }
-
-    _breath_first(node){
-
-    }
-
-    _depth_first(node){
 
     }
 

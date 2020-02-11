@@ -9,7 +9,8 @@ var worst_case = [90, 80, 70, 60, 50, 40, 30, 20, 10];
 var iteration = 1;
 
 var best_case = [10, 20, 30, 40, 50, 60, 70, 80, 90];
-
+var best_case = [2, 1, 3, 1, 2];
+var temp = 0;
 function partition(array, start_index, end_index, test_case){
     iteration++;
     
@@ -30,6 +31,7 @@ function partition(array, start_index, end_index, test_case){
     for(var i = start_index + 1; i <= end_index;i++){
         iteration++;
         if(array[pivot_index] > array[i]){
+            temp++;
             array[open_index] = [array[i] , array[i] = array[open_index]][0] // intelligent swap
             open_index = open_index + 1;
         }
@@ -48,9 +50,12 @@ function partition(array, start_index, end_index, test_case){
     
     console.log(`\n\n\n\n\nOVER iterations or Time Complexity : ${iteration} for ${test_case}`)
     console.log(array)
+    console.log(temp);
+
     process.exit();
 }
 
 //partition(average_case, 0 , average_case.length-1, 'average case')
 // partition(worst_case, 0 , worst_case.length-1, 'worst case')
  partition(best_case, 0 , best_case.length-1, 'best case')
+ 

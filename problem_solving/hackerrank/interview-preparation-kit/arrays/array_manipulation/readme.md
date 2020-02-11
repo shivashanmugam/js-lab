@@ -1,0 +1,1 @@
+https://stackoverflow.com/questions/48162233/logic-used-behind-array-manipulation-of-hackerrank
