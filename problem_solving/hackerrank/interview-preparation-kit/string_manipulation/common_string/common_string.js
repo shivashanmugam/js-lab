@@ -16,38 +16,37 @@ rl.on('line', (input) => {
     }
     if(lineNumber == 2){
         s2 = input.replace(getEOL(), '');
-        commonString(s1, s2)
+        console.log(commonString(s1, s2))
     }
 });
 
-function commonString(s1, s2){
-    var s1_index = 0, s2_index = 0;
-    var num_of_characters_deleted = 0;
-    for(var subStringLen = 1;subStringLen <= s1.length;subStringLen++){
-        for(var delete_at = 0; delete_at <= (s1.length - subStringLen + 1);delete_at++){
-            for(var deleteLength = 0;deleteLength <= (s1.length + 2 - (subStringLen + delete_at));deleteLength++ ){
-                
-            }
-        }
+function commonString(s1, s2) {
+    const s1Length = s1.length;
+    const s2Length = s2.length;
+    const lengthTable = [...Array(s1Length+1)].map(x=>Array(s2Length+1).fill(0))       
+    for(var i = 0;i< s1Length;i++){
+      lengthTable[0][i] = 0;
+      lengthTable[i][0] = 0
     }
+    for(var j = 1;j <= s1Length;j++){
+      for(var i = 1;i <= s1Length;i++){
+        lengthTable[i][j] = Math.max(lengthTable[i-1][j], lengthTable[i][j-1]) + checkChar(s1[i-1], s2[j-1])
+        console.log(lengthTable[i][j])
+      }
+      
+    }
+    return lengthTable[s1Length][s2Length]
+    
+  }
+
+function checkChar(charA, charB){
+  if(charA == charB) return 1
+  else return 0
 }
-//                         SHINCHAN,  2,           3,             0,                 5
-function generateSubstring(string, deleteAt, deleteLength, subStringStartIndex, subStringLength){
-    // 0 1 [2 3 4] 5 6 7
-    // S H [I N C] H A N => SH + HAN
-
-    // subString_1 = substring starting index to delete_at  // S H
-    // subString_2 = (deleteAt + deleting String length) to remaining subStringLength to cover
-    return string.slice(subStringStartIndex, deleteAt) + 
-            string.slice(deleteAt+deleteLength, (deleteAt+deleteLength + (subStringLength - string.slice(subStringStartIndex, deleteAt).length)))
-} 
-
-
 
 
 module.exports = {
-    commonString : commonString,
-    generateSubstring : generateSubstring
+    commonString : commonString
 }
 
 
