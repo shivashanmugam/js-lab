@@ -30,13 +30,25 @@ function commonString(s1, s2) {
     }
     for(var j = 1;j <= s1Length;j++){
       for(var i = 1;i <= s1Length;i++){
-        lengthTable[i][j] = Math.max(lengthTable[i-1][j], lengthTable[i][j-1]) + checkChar(s1[i-1], s2[j-1])
-        console.log(lengthTable[i][j])
+        if(checkChar(s1[i-1], s2[j-1])){
+          lengthTable[i][j] = Math.max(lengthTable[i-1][j-1]) + checkChar(s1[i-1], s2[j-1])
+        }else{
+          lengthTable[i][j] = Math.max(lengthTable[i-1][j], lengthTable[i][j-1])  
+          
+        }
       }
       
     }
+    // arr = lengthTable;
+    // arrText = ''
+    // for (var i = 0; i < arr.length; i++) {
+    //   for (var j = 0; j < arr[i].length; j++) {
+    //       arrText+=arr[i][j]+' ';
+    //   }
+    //   console.log(arrText);
+    //   arrText='';
+    // }
     return lengthTable[s1Length][s2Length]
-    
   }
 
 function checkChar(charA, charB){

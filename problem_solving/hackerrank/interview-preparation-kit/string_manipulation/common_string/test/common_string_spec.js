@@ -5,5 +5,6 @@ var expect = chai.expect;
 describe('generateSubstring', function () {
     it('Testing Common String', function(){
         expect(commonString('ABCDEFG', 'ACDFGHI')).to.equal(5)
+        expect(commonString('SHINCHAN', 'NOHARAAA')).to.equal(3)
     })
 })
