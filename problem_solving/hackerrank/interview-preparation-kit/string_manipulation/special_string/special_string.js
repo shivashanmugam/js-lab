@@ -20,41 +20,55 @@ rl.on('line', (input) => {
 
 
 function getTotalSpecialStrings(string) {
-    var toCheckSpecialCase = '';
-    var totalSpecialStrings = 0
-    var aggreateToRemove = 0; 
-    for(var start = 0, end = 1;end < string.length;){
-        if((end - start) <= toCheckSpecialCase.length){
-            if(string.slice(start+1, end+1) == toCheckSpecialCase.slice(toCheckSpecialCase.length-(end - start), toCheckSpecialCase.length)){
-                totalSpecialStrings++;
-            }else{
-                if(string[end] == string[start-1]){
-                    totalSpecialStrings++;
-                }
-                toCheckSpecialCase = '';
-            }
-            if((end - start) == toCheckSpecialCase.length){
-                toCheckSpecialCase = '';
+    // TYPE 1 => aaa 
+    // TYPE 2 => aabaa
+    var PET = false; //previous Eligigible for Type 2
+    var countC3 = new Array(string.length);
+    var countC3Type2 = new Array(string.length);
+    var charC3 = new Array(string.length);
+    var [curI, c3I, nexI] = [0,0,1];
+    var c3I = 0;
+    var returnVal = 0
+    var curChar, nexChar;
+    while(curI < string.length){
+        nexChar = string[nexI]
+        curChar = string[curI];
+        charC3[c3I] = curChar;
+        countC3Type2[c3I] = 0;
+        countC3[c3I] = 1;
+        while(curChar == nexChar){
+            countC3[c3I] =  countC3[c3I] + 1
+            nexI++;
+            nexChar = string[nexI]
+        }
+
+
+        if(PET && c3I > 1){ //Type 2 check
+            if(curChar == charC3[c3I - 2]){
+                countC3Type2[c3I] = Math.min(countC3[c3I], countC3[c3I-2]) 
             }
         }
-        if(string[start] == string[end]){
-            end++;
-            aggreateToRemove = (( ((end - start) * (end - start + 1)) / 2) - (end - start))
-        } else {
-            totalSpecialStrings = ( totalSpecialStrings + (( ((end - start) * (end - start + 1)) / 2) - (end - start)) ) // (n(n+1) / 2 ) - n // the minus n is to omit single character count
-            
-            if(toCheckSpecialCase[0] != string[end]){
-                toCheckSpecialCase = string.slice(start, end);
-            }
-            start = end;
-            end++;
-            aggreateToRemove = 0;
+
+        if(countC3[c3I] == 1){
+            PET = true;
+        }else{
+            PET = false;
         }
+
+        returnVal = returnVal + sumofN(countC3[c3I])  + countC3Type2[c3I];
+        c3I++;
+        curI = nexI;
+        nexI++;
     }
-    totalSpecialStrings += string.length + aggreateToRemove;
-    
-    
-    return totalSpecialStrings;
+    // console.log(charC3)
+    // console.log(countC3)
+    // console.log(countC3Type2)
+    return returnVal;
+}
+
+
+function sumofN(n){
+    return (n*(n+1))/2
 }
 
 
