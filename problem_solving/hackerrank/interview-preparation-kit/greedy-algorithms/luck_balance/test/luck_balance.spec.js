@@ -1,12 +1,20 @@
-var min_absolute_diff_array = require('../luck_balance').luckBalance;
+var luckBalance = require('../luck_balance').luckBalance;
+var sortTestsByLowLuckAndImportanceTrue = require('../luck_balance').sortTestsByLowLuckAndImportanceTrue;
 var chai = require('../../../../../../libs/chai/chai')
 var expect = chai.expect;
 
+describe('sortTestsByLowLuckAndImportanceTrue', function () {
+    it('sortTestsByLowLuckAndImportanceTrue', function () {
+        var array = [7,4,6,1];
+        expect(sortTestsByLowLuckAndImportanceTrue(array)).to.eql([1,4,6,7])
+    })
+})
+
+
 describe('luckBalance', function () {
     it('luckBalance', function () {
-        var array = [7,4,6,1];
-        expect(luckBalance(array)).to.eql(1)
-        expect(luckBalance(["-59", "-36", "-13", "1", "-53", "-92", "-2", "-96", "-54", "75"])).to.eql(1)
+        var array = [1,4,6,7];
+        expect(luckBalance(array, 2)).to.eql(5)
     })
 })
 

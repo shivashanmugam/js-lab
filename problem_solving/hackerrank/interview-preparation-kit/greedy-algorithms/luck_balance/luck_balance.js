@@ -1,49 +1,47 @@
-const readline = require('readline');
-function getEOL() {
-    return process.platform == "win32" ? "\r\n" : "\n";
-}
+var getLine = require('../../../../../utils/input/input').getLine;
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdin.output
-})
-var tests = []
-var array = [];
-var lineNumber = 0;
-var assuredLuckBalance = 0;
-var importantContestAllowedToLose;
-var totalTests;
-rl.on('line', (input) => {
-    lineNumber++;
-    if (lineNumber == 1) {
-        input = input.replace(getEOL(), '');
-        array = input.split(' ')
-        importantContestAllowedToLose = array[1]
-        totalTests = Number(array[0])
-    } else if(lineNumber <= totalTests+1){
-        console.log(`-----------${lineNumber}`)
-        input = input.replace(getEOL(), '');
-        array = input.split(' ').map( (elem) =>  Number(elem))
-        if(array[1] == 0){
-            assuredLuckBalance = assuredLuckBalance + array[0]
-            console.log('\n--------------')
-            console.log(lineNumber)
-            console.log(assuredLuckBalance)
-        }
-        tests.push(array)
-
-        if(lineNumber == totalTests+1){
-            console.log(luckBalance(tests,importantContestAllowedToLose, assuredLuckBalance))
+async function main(){
+    let lineText = await getLine();
+    const [testCount, maximumImportantTestToLose] = lineText.split(' ').map( str => Number.parseInt(str));
+    const testDetails = []
+    let luckByNonImportantTests = 0;
+    for(let i = 0;i < testCount;i++){
+        lineText = await getLine();
+        const [testLuck, isImportant] = lineText.split(' ').map( str => Number.parseInt(str));
+        if(isImportant){
+            testDetails.push(testLuck);
+        }else{
+            luckByNonImportantTests  = luckByNonImportantTests + testLuck;
         }
     }
-});
 
-function luckBalance(ImportantTests, importantContestAllowedToLose, assuredLuckBalance){
-    console.log(ImportantTests)
-    console.log(importantContestAllowedToLose)
-    console.log(assuredLuckBalance)
+    console.log(luckByNonImportantTests + luckBalance(testDetails, maximumImportantTestToLose))
+    process.exit();
 }
 
+function luckBalance(testDetails, maximumImportantTestToLose){
+    testDetails = sortTestsByLowLuckAndImportanceTrue(testDetails)
+    let luckSaved = 0;
+    let luckSpent = 0;
+    testDetails.forEach((testLuck) => {
+        if(maximumImportantTestToLose-- > 0){
+            luckSaved = luckSaved + testLuck;
+        }else{
+            luckSpent = luckSpent + testLuck;
+        }
+    });
+    return luckSaved - luckSpent;
+}
+
+function sortTestsByLowLuckAndImportanceTrue(tests){
+    tests.sort((testObjA, testObjB) => {
+        return testObjB - testObjA;
+    });
+    return tests;
+}
+
+main()
 module.exports = {
-    luckBalance
+    luckBalance,
+    sortTestsByLowLuckAndImportanceTrue
 }
