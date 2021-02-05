@@ -25,10 +25,12 @@ rl.on('line', (input) => {
 });
 
 function sherlockAndAnagrams(inputStrArray) {
-    console.time('start');
     var subStringArray = [];
+
+    /* iterating all the input words  */
     for (var count = 0; count < inputStrArray.length; count++) {
         var curStr = inputStrArray[count];
+        /* storing each input word's substring in to a 3D array called subStringArray */
         subStringArray[count] = [];
         for (var subStrLength = 1; subStrLength <= curStr.length; subStrLength++) {
             subStringArray[count][subStrLength - 1] = [];
@@ -38,33 +40,15 @@ function sherlockAndAnagrams(inputStrArray) {
         }
     }
 
+    /* iterating all the input word's substring */
     for (var count = 0; count < subStringArray.length; count++) {
         var totalAnagrams = 0;
+        /* iterating through each each substring array getting the anagram  */
         for(var i = 0;i < subStringArray[count].length;i++){
-            totalAnagrams = totalAnagrams + sherlockAndAnagrams1(subStringArray[count][i]);
+            totalAnagrams = totalAnagrams + getTotalSubStringAnagrams(subStringArray[count][i]);
         }
         console.log(totalAnagrams);
     }
-    console.timeEnd('start');
-}
-
-function sherlockAndAnagrams1(s) {
-    var anagrams = 0;
-    for (var len = 1; len < s.length; len++) {
-        var parts = [];
-        for (var pos = 0; pos <= s.length - len; pos++) {
-            var part = s.substr(pos, len);
-            parts.push(part.split('').sort().join(''));
-        }
-        for (var index1 = 0; index1 < parts.length; index1++) {
-            var part1 = parts[index1];
-            for (var index2 = index1 + 1; index2 < parts.length; index2++) {
-                var part2 = parts[index2];
-                if (part1 == part2) anagrams++;
-            }
-        }
-    }
-    return anagrams;
 }
 
 function getTotalSubStringAnagrams(array) {
@@ -74,7 +58,7 @@ function getTotalSubStringAnagrams(array) {
         for(var j = i+1;j < array.length;j++){
             var word2 = array[j];
             if(allAnagrams[`${word1}${word2}`] == undefined){
-                if(isAnagrams(word1, word2)){
+                if(isAnagrams1(word1, word2)){
                     totalAnagrams++;
                 }
             } else if(allAnagrams[`${word1}${word2}`] == true){
@@ -85,11 +69,35 @@ function getTotalSubStringAnagrams(array) {
     return totalAnagrams;
 }
 
-function isAnagrams(word1, word2){
+/* sorts each word and checks whether both are same after combining */
+function isAnagramsMethodOne(word1, word2){
     word1 = word1.split('').sort().join('');
     word2 = word2.split('').sort().join('');
-    isAnagrams[`${word1}${word2}`] = (word1 == word2);
+    allAnagrams[`${word1}${word2}`] = (word1 == word2);
     return word1 == word2;
+}
+
+
+/* checks each letter occurence of word1 with word2, If all matches returns true, Else false */
+function isAnagramsMethodTwo(word1, word2){
+    var evaluatedLetters = {};
+    for(var letterIndex = 0;letterIndex < word1.length;letterIndex++){
+        var letter = word1[letterIndex];
+        /* skipping if already evaluted the letter */
+        if(evaluatedLetters[letter]) continue;
+
+        var letterOccurenceWord1 = word1.match(new RegExp(letter, 'g')).length;
+        var letterOccurenceWord2 = word2.match(new RegExp(letter, 'g')) ? word2.match(new RegExp(letter, 'g')).length :  0;
+        if(letterOccurenceWord1 == letterOccurenceWord2){
+            evaluatedLetters[letter] = letter;
+            continue;
+        }else{
+            allAnagrams[`${word1}${word2}`] = false;
+            return false;
+        }
+    }
+    allAnagrams[`${word1}${word2}`] = true;
+    return true;
 }
 
 module.exports = {
